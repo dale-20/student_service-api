@@ -12,8 +12,10 @@ pnpm install --frozen-lockfile
 Copy-Item .env.example .env
 php artisan key:generate
 php artisan migrate --seed
-composer dev
+php artisan serve
 ```
+
+Set `FRONTEND_URLS` and `SANCTUM_STATEFUL_DOMAINS` to the exact Nuxt origins. The API uses credentialed first-party Sanctum session cookies and is exposed under `/api/v1`.
 
 ## Development database
 

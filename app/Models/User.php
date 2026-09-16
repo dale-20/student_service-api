@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\RoleSlug;
 use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -21,6 +22,7 @@ use Laravel\Sanctum\HasApiTokens;
     'email',
     'email_verified_at',
     'password',
+    'must_change_password',
     'status',
     'last_login_at',
 ])]
@@ -29,6 +31,11 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
+
+    public function hasRole(RoleSlug ...$roles): bool
+    {
+        return in_array($this->role?->slug, $roles, true);
+    }
 
     public function role(): BelongsTo
     {
@@ -56,6 +63,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
             'status' => UserStatus::class,
         ];
     }
