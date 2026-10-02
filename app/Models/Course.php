@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['course_code', 'course_title', 'description', 'units', 'status'])]
 class Course extends Model
@@ -16,9 +17,12 @@ class Course extends Model
     /** @use HasFactory<CourseFactory> */
     use HasFactory;
 
+    use SoftDeletes;
+
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(Program::class, 'program_courses')
+            ->wherePivotNull('deleted_at')
             ->withPivot(['year_level', 'semester', 'is_required'])
             ->withTimestamps();
     }

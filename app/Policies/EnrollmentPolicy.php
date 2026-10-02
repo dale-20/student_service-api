@@ -34,4 +34,14 @@ class EnrollmentPolicy
     {
         return $this->staff($user);
     }
+
+    public function delete(User $user, Enrollment $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
+
+    public function restore(User $user, Enrollment $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
 }

@@ -27,4 +27,14 @@ class StudentPolicy
     {
         return $this->viewAny($user);
     }
+
+    public function delete(User $user, Student $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
+
+    public function restore(User $user, Student $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
 }

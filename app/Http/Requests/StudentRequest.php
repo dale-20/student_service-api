@@ -21,12 +21,12 @@ class StudentRequest extends FormRequest
         $student = $this->route('student');
 
         return [
-            'user_id' => ['nullable', 'integer', 'exists:users,id', Rule::unique('students', 'user_id')->ignore($student), function (string $attribute, mixed $value, Closure $fail): void {
-                if ($value && ! User::query()->whereKey($value)->whereHas('role', fn ($query) => $query->where('slug', RoleSlug::Student))->where('status', 'active')->exists()) {
+            'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')->whereNull('deleted_at'), Rule::unique('students', 'user_id')->ignore($student), function (string $attribute, mixed $value, Closure $fail): void {
+                if ($value && ! User::query()->whereKey($value)->whereHas('role', fn ($query) => $query->where('slug', RoleSlug::Student))->when((int) $value !== $this->route('student')?->user_id, fn ($query) => $query->where('status', 'active'))->exists()) {
                     $fail('The selected account must be an active student account.');
                 }
             }],
-            'program_id' => ['required', 'integer', 'exists:programs,id'],
+            'program_id' => ['required', 'integer', Rule::exists('programs', 'id')->whereNull('deleted_at')],
             'student_number' => ['required', 'string', 'max:20', Rule::unique('students')->ignore($student)],
             'first_name' => ['required', 'string', 'max:255'],
             'middle_name' => ['nullable', 'string', 'max:255'],

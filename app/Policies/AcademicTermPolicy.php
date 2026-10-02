@@ -32,4 +32,14 @@ class AcademicTermPolicy
     {
         return $this->staff($user);
     }
+
+    public function delete(User $user, AcademicTerm $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
+
+    public function restore(User $user, AcademicTerm $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
 }

@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\InstructorOfferingController;
 use App\Http\Controllers\Api\V1\LookupController;
 use App\Http\Controllers\Api\V1\PasswordController;
 use App\Http\Controllers\Api\V1\ProgramController;
+use App\Http\Controllers\Api\V1\RecordRecoveryController;
+use App\Http\Controllers\Api\V1\RecycleBinController;
 use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\StudentAcademicRecordController;
 use App\Http\Controllers\Api\V1\StudentController;
@@ -42,6 +44,9 @@ Route::prefix('v1')->group(function (): void {
 
             Route::middleware('role:'.RoleSlug::Administrator->value.','.RoleSlug::Registrar->value)->group(function (): void {
                 Route::get('lookups', LookupController::class);
+                Route::get('recycle-bin', [RecycleBinController::class, 'index']);
+                Route::post('recycle-bin/{type}/{record}/restore', [RecordRecoveryController::class, 'store'])->whereNumber('record');
+                Route::delete('{type}/{record}', [RecycleBinController::class, 'destroy'])->whereNumber('record');
                 Route::apiResource('students', StudentController::class)->except('destroy');
                 Route::apiResource('programs', ProgramController::class)->except('destroy');
                 Route::put('programs/{program}/curriculum', [CurriculumController::class, 'update']);
@@ -51,6 +56,7 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('enrollments', [EnrollmentController::class, 'index']);
                 Route::post('enrollments', [EnrollmentController::class, 'store']);
                 Route::get('enrollments/{enrollment}', [EnrollmentController::class, 'show']);
+                Route::put('enrollments/{enrollment}', [EnrollmentController::class, 'update']);
                 Route::patch('enrollments/{enrollment}/status', [EnrollmentStatusController::class, 'update']);
                 Route::get('students/{student}/academic-record', [AcademicRecordController::class, 'show']);
             });

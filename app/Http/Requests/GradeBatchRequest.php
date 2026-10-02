@@ -17,7 +17,8 @@ class GradeBatchRequest extends FormRequest
     {
         return [
             'grades' => ['required', 'array', 'min:1'],
-            'grades.*.enrollment_id' => ['required', 'integer', 'distinct', 'exists:enrollments,id'],
+            'grades.*' => ['array:enrollment_id,midterm_grade,final_grade,remarks'],
+            'grades.*.enrollment_id' => ['required', 'integer', 'distinct', Rule::exists('enrollments', 'id')->whereNull('deleted_at')],
             'grades.*.midterm_grade' => ['nullable', 'numeric', 'between:1,5'],
             'grades.*.final_grade' => ['nullable', 'numeric', 'between:1,5'],
             'grades.*.remarks' => ['nullable', Rule::enum(GradeRemark::class)],

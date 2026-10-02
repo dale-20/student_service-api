@@ -37,4 +37,14 @@ class CourseOfferingPolicy
     {
         return $this->staff($user) || ($user->hasRole(RoleSlug::Instructor) && $offering->instructor_id === $user->id);
     }
+
+    public function delete(User $user, CourseOffering $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
+
+    public function restore(User $user, CourseOffering $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
 }

@@ -32,4 +32,14 @@ class CoursePolicy
     {
         return $this->staff($user);
     }
+
+    public function delete(User $user, Course $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
+
+    public function restore(User $user, Course $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator, RoleSlug::Registrar);
+    }
 }

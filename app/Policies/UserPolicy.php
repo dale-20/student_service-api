@@ -31,4 +31,14 @@ class UserPolicy
     {
         return $user->is($model);
     }
+
+    public function delete(User $user, User $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator);
+    }
+
+    public function restore(User $user, User $record): bool
+    {
+        return $user->hasRole(RoleSlug::Administrator);
+    }
 }

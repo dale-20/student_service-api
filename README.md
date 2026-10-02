@@ -48,3 +48,19 @@ composer quality
 This checks Laravel Pint formatting and runs the Pest test suite, including architecture and security rules. All checks must pass before a change is complete.
 
 Development conventions and the definition of done are documented in [CONTRIBUTING.md](CONTRIBUTING.md). Rules for coding agents are in [AGENTS.md](AGENTS.md).
+
+## Soft deletion and recovery
+
+Run `php artisan migrate` after updating the application. The soft-delete migration adds indexed `deleted_at` columns without removing records.
+
+- `DELETE /api/v1/{type}/{id}` moves a record to Deleted records.
+- `GET /api/v1/recycle-bin?type=students&search=...&page=1` lists deleted records with pagination.
+- `POST /api/v1/recycle-bin/{type}/{id}/restore` recovers the original record.
+
+Supported types: `users`, `students`, `programs`, `courses`, `academic-terms`, `course-offerings`, `enrollments`, `curriculum`, and `schedules`. User operations require an administrator; other recovery operations allow administrators and registrars. Regular lists and mutations exclude deleted records. Unique identifiers remain reserved so recovery does not require changing record identities.
+
+Grades have no delete or recovery endpoints. Enrollments with grade records cannot be deleted or reassigned. Parent deletion is rejected with `409` when undeleted dependent academic records exist. Recover a deleted parent before its children. Recovering or reactivating an enrollment rechecks capacity, student status, and offering availability.
+
+`PUT /api/v1/enrollments/{id}` accepts `student_id`, `course_offering_id`, `enrollment_date`, and `status`. The existing status endpoint also supports corrections back to `enrolled`. Enrollment history prevents changing an offering's course or academic term.
+
+Curriculum synchronization preserves row IDs and soft-deletes removed entries. Its response field is `curriculum`; semesters are `first`, `second`, or `summer`, and `is_required` supports optional courses. Schedule synchronization also preserves existing IDs and makes removed schedules recoverable.

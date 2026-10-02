@@ -17,7 +17,8 @@ class CurriculumRequest extends FormRequest
     {
         return [
             'courses' => ['present', 'array'],
-            'courses.*.course_id' => ['required', 'integer', 'distinct', 'exists:courses,id'],
+            'courses.*' => ['array:course_id,year_level,semester,is_required'],
+            'courses.*.course_id' => ['required', 'integer', 'distinct', Rule::exists('courses', 'id')->whereNull('deleted_at')],
             'courses.*.year_level' => ['nullable', 'integer', 'between:1,5'],
             'courses.*.semester' => ['nullable', Rule::enum(Semester::class)],
             'courses.*.is_required' => ['required', 'boolean'],

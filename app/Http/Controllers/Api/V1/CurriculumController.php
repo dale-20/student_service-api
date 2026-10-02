@@ -14,8 +14,17 @@ class CurriculumController extends Controller
     {
         $this->authorize('update', $program);
         DB::transaction(function () use ($request, $program): void {
-            $program->programCourses()->delete();
-            $program->programCourses()->createMany($request->validated('courses'));
+            $program = Program::query()->lockForUpdate()->findOrFail($program->id);
+            $retained = [];
+            foreach ($request->validated('courses') as $row) {
+                $entry = $program->programCourses()->withTrashed()->firstOrNew(['course_id' => $row['course_id']]);
+                $entry->fill($row)->save();
+                if ($entry->trashed()) {
+                    $entry->restore();
+                }
+                $retained[] = $entry->id;
+            }
+            $program->programCourses()->whereNotIn('id', $retained)->delete();
         });
 
         return (new ProgramResource($program->load(['programCourses.course'])->loadCount(['students', 'courses'])))->additional(['message' => 'Curriculum updated successfully.']);

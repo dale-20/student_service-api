@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['program_id', 'course_id', 'year_level', 'semester', 'is_required'])]
 class ProgramCourse extends Model
@@ -15,14 +16,16 @@ class ProgramCourse extends Model
     /** @use HasFactory<ProgramCourseFactory> */
     use HasFactory;
 
+    use SoftDeletes;
+
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class)->withTrashed();
     }
 
     public function course(): BelongsTo
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class)->withTrashed();
     }
 
     protected function casts(): array

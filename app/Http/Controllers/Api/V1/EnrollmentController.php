@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\EnrollStudent;
+use App\Actions\UpdateEnrollment;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EnrollmentRequest;
+use App\Http\Requests\EnrollmentUpdateRequest;
 use App\Http\Resources\EnrollmentResource;
 use App\Models\Enrollment;
 use App\Models\Student;
@@ -35,6 +37,14 @@ class EnrollmentController extends Controller
     public function show(Enrollment $enrollment): EnrollmentResource
     {
         $this->authorize('view', $enrollment);
+
+        return new EnrollmentResource($enrollment->load(['student.program', 'courseOffering.course', 'courseOffering.academicTerm', 'grade']));
+    }
+
+    public function update(EnrollmentUpdateRequest $request, Enrollment $enrollment, UpdateEnrollment $action): EnrollmentResource
+    {
+        $this->authorize('update', $enrollment);
+        $enrollment = $action->execute($enrollment, $request->validated());
 
         return new EnrollmentResource($enrollment->load(['student.program', 'courseOffering.course', 'courseOffering.academicTerm', 'grade']));
     }

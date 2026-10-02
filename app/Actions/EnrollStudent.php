@@ -29,9 +29,9 @@ class EnrollStudent
                 throw new ConflictHttpException('One or more course offerings are unavailable.');
             }
 
-            $existing = Enrollment::query()->where('student_id', $student->id)->whereIn('course_offering_id', $offeringIds)->exists();
+            $existing = Enrollment::withTrashed()->where('student_id', $student->id)->whereIn('course_offering_id', $offeringIds)->exists();
             if ($existing) {
-                throw new ConflictHttpException('The student is already enrolled in one of the selected offerings.');
+                throw new ConflictHttpException('An enrollment already exists for a selected offering. Update its status or recover it from Deleted records.');
             }
 
             foreach ($offerings as $offering) {
